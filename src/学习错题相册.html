@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学习错题相册</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background:
+      radial-gradient(1000px 620px at 88% -12%, rgba(52, 211, 153, 0.30), transparent 62%),
+      radial-gradient(900px 560px at -12% 18%, rgba(45, 212, 191, 0.24), transparent 60%),
+      radial-gradient(950px 700px at 55% 115%, rgba(163, 230, 180, 0.38), transparent 65%),
+      linear-gradient(155deg, #f1f7ea 0%, #dff0e6 45%, #d5ebe4 100%) fixed;
+    color: #2e3d35;
+    min-height: 100vh;
+  }
+  /* ===== 星空按钮（极光绿夜） ===== */
+  .btn-starry {
+    background: linear-gradient(135deg, #06281f 0%, #0f4d3a 60%, #14604a 100%) !important;
+    color: #fff !important;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(15, 77, 58, 0.40);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-starry::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 20% 30%, #fff, transparent),
+      radial-gradient(1px 1px at 60% 65%, rgba(255,255,255,0.9), transparent),
+      radial-gradient(1.5px 1.5px at 80% 25%, rgba(190,255,220,0.9), transparent),
+      radial-gradient(1px 1px at 35% 75%, rgba(255,255,255,0.8), transparent);
+    pointer-events: none;
+  }
+  .btn-starry:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(15, 77, 58, 0.5); }
+  .btn-starry:active { transform: scale(0.95); box-shadow: 0 2px 8px rgba(15, 77, 58, 0.35); }
+  /* ===== 苹果毛玻璃卡片 ===== */
+  .glass {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(18px) saturate(1.7);
+    -webkit-backdrop-filter: blur(18px) saturate(1.7);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow: 0 8px 28px rgba(25, 100, 75, 0.10);
+  }
+
+  /* ===== 启动屏 ===== */
+  .splash {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(160deg, #0a0e27 0%, #1a1a3e 40%, #2d1b4e 70%, #1a1a3e 100%);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  .splash.hide {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .splash-sky {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .splash-moon {
+    position: absolute;
+    top: 8%;
+    right: 12%;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fffbe6 0%, #fff3a0 50%, #e8d96a 100%);
+    box-shadow: 0 0 40px rgba(255,243,160,0.5), 0 0 80px rgba(255,243,160,0.25);
+  }
+  .stars {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 4px rgba(255,255,255,0.8);
+    animation: twinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+  }
+  .meteor {
+    position: absolute;
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 25%, transparent 100%);
+    border-radius: 2px;
+    opacity: 0;
+    box-shadow: 0 0 8px 2px rgba(255,255,255,0.5);
+    transform-origin: left center;
+  }
+  @keyframes meteor {
+    0% { opacity: 0; transform: rotate(-45deg) translateX(-120px); }
+    8% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { opacity: 0; transform: rotate(-45deg) translateX(110vw); }
+  }
+  .splash-inner {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #fff;
+    animation: splashFadeIn 0.8s ease;
+  }
+  .splash-class {
+    position: absolute;
+    bottom: 150px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+    color: rgba(255,255,255,0.75);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 6px;
+    opacity: 0;
+    z-index: 3;
+    text-shadow: 0 0 16px rgba(255,255,255,0.5);
+    animation: creditPop 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s forwards;
+  }
+  .splash-credit {
+    position: absolute;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+    color: rgba(255,255,255,0.9);
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: 10px;
+    opacity: 0;
+    z-index: 3;
+    text-shadow: 0 0 24px rgba(255,255,255,0.7);
+    animation: creditPop 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards;
+  }
+  @keyframes creditPop {
+    0% { opacity: 0; transform: translateX(-50%) scale(0.5) translateY(20px); }
+    60% { opacity: 1; transform: translateX(-50%) scale(1.1) translateY(0); }
+    100% { opacity: 0.8; transform: translateX(-50%) scale(1) translateY(0); }
+  }
+  @keyframes splashFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .splash-icon {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: splashBounce 2s ease-in-out infinite;
+  }
+  @keyframes splashBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .splash-tag {
+    font-size: 56px;
+    font-weight: 800;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    width: 100px;
+    height: 100px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(255,255,255,0.15), inset 0 1px 0 rgba(255,255,255,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .splash-title {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .splash-sub {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 32px;
+    letter-spacing: 1px;
+  }
+  .splash-loading {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  .splash-loading span {
+    width: 10px;
+    height: 10px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 50%;
+    animation: splashDot 1.4s ease-in-out infinite;
+  }
+  .splash-loading span:nth-child(2) { animation-delay: 0.2s; }
+  .splash-loading span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes splashDot {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ===== 顶部导航 ===== */
+  header {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  header h1 { font-size: 18px; color: #0f9d6f; white-space: nowrap; }
+  /* ===== 分类栏（独立一行） ===== */
+  .nav-bar {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 8px 24px;
+    position: sticky;
+    top: 60px;
+    z-index: 9;
+  }
+  .nav-bar nav { display: flex; gap: 8px; overflow-x: auto; max-width: 1200px; margin: 0 auto; }
+  .nav-bar nav::-webkit-scrollbar { display: none; }
+
+  nav { display: flex; gap: 8px; }
+  nav button {
+    border: none;
+    background: rgba(255, 255, 255, 0.55);
+    font-size: 15px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    color: #4d5f56;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s;
+  }
+  nav button.active {
+    background: rgba(255, 255, 255, 0.95);
+    font-weight: 700;
+    background-image: linear-gradient(135deg, #34c98e, #0e9f6e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    box-shadow: 0 3px 12px rgba(20, 140, 100, 0.18);
+  }
+  nav button:hover:not(.active) { background: rgba(255, 255, 255, 0.9); }
+  .nav-bar nav button[data-subject="高数"].active { background: rgba(255,255,255,0.95); background-image: linear-gradient(135deg, #2bb3a3, #0f9d8f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav-bar nav button[data-subject="计算机"].active { background: rgba(255,255,255,0.95); background-image: linear-gradient(135deg, #3fbf7f, #1f9d60); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav-bar nav button[data-subject="英语"].active { background: rgba(255,255,255,0.95); background-image: linear-gradient(135deg, #f0b429, #d98e1f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* ===== 备份按钮 ===== */
+  .backup-actions { margin-left: auto; display: flex; gap: 8px; }
+  .backup-actions button {
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.5);
+    color: #0f9d6f;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .backup-actions button:hover { background: rgba(255, 255, 255, 0.9); }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+  /* ===== 工具栏 ===== */
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .btn-primary {
+    background: #4a9cf5;
+    color: #fff;
+    border: none;
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-primary:hover { background: #3a8ce0; }
+  .toolbar input[type="search"], .toolbar select {
+    padding: 8px 12px;
+    border: 1px solid #d4e2f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff;
+    outline: none;
+  }
+  .toolbar input[type="search"] { flex: 1; min-width: 160px; max-width: 320px; }
+  .toolbar input[type="search"]:focus, .toolbar select:focus { border-color: #34c98e; }
+
+  /* ===== 图片卡片网格 ===== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(18px) saturate(1.7);
+    -webkit-backdrop-filter: blur(18px) saturate(1.7);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(25, 100, 75, 0.10);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(25, 100, 75, 0.18); }
+  .card img.thumb {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    cursor: zoom-in;
+    background: #eaf1f8;
+    display: block;
+  }
+  .card-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .note-input {
+    width: 100%;
+    border: 1px solid #e0ebf5;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 56px;
+    outline: none;
+    background: #fafcfe;
+  }
+  .note-input:focus { border-color: #34c98e; background: #fff; }
+
+  /* ===== 标签 ===== */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .tag {
+    background: linear-gradient(135deg, #eef4ef, #e0ebe4);
+    color: #5f7d6b;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+  }
+  .tag:has(.tag-x[data-tag="高数"]) { background: linear-gradient(135deg, #dcf5f2, #c8efea); color: #0f9d8f; }
+  .tag:has(.tag-x[data-tag="计算机"]) { background: linear-gradient(135deg, #e0f7ea, #c9f0da); color: #1f9d60; }
+  .tag:has(.tag-x[data-tag="英语"]) { background: linear-gradient(135deg, #fdf1d7, #fbe7bd); color: #d98e1f; }
+  .tag .tag-x { cursor: pointer; font-weight: bold; opacity: 0.6; }
+  .tag .tag-x:hover { opacity: 1; }
+  .tag-add-input {
+    border: 1px dashed #c4d9ee;
+    border-radius: 12px;
+    padding: 3px 8px;
+    font-size: 12px;
+    width: 76px;
+    outline: none;
+    color: #2b7cd3;
+    background: transparent;
+  }
+  .tag-add-input:focus { border-color: #34c98e; }
+  .tag-quick {
+    border: 1px dashed #c4d9ee;
+    border-radius: 12px;
+    padding: 3px 8px;
+    font-size: 12px;
+    color: #2b7cd3;
+    background: transparent;
+    cursor: pointer;
+  }
+  .tag-quick:hover { background: #e0f7ea; border-color: #34c98e; }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+  }
+  .time { font-size: 12px; color: #9ab; }
+  .btn-del {
+    border: none;
+    background: none;
+    color: #d66;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .btn-del:hover { background: #fdeeee; }
+
+  .empty { text-align: center; color: #9ab; padding: 60px 0; font-size: 14px; }
+  .empty::before {
+    content: attr(data-icon);
+    display: block;
+    font-size: 52px;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 4px 10px rgba(100, 130, 200, 0.25));
+  }
+
+  /* ===== 顶部提示条 ===== */
+  .toast {
+    position: fixed;
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-12px);
+    background: #2b4a6f;
+    color: #fff;
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(30, 70, 120, 0.25);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 200;
+    max-width: 86vw;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: #d66; }
+
+  /* ===== 大图预览 ===== */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 40, 60, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .overlay img {
+    max-width: 92vw;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .overlay .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .overlay .close-btn:hover { background: rgba(255,255,255,0.3); }
+
+  /* ===== 备忘录列表 ===== */
+  .memo-item {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(18px) saturate(1.7);
+    -webkit-backdrop-filter: blur(18px) saturate(1.7);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 20px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 8px 28px rgba(25, 100, 75, 0.10);
+    cursor: pointer;
+  }
+  .memo-item:hover { box-shadow: 0 12px 32px rgba(25, 100, 75, 0.16); }
+  .memo-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .memo-title { font-size: 16px; font-weight: 600; color: #2b4a6f; }
+  .memo-actions button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .memo-actions .edit { color: #4a9cf5; }
+  .memo-actions .edit:hover { background: #e3f0fd; }
+  .memo-actions .del { color: #d66; }
+  .memo-actions .del:hover { background: #fdeeee; }
+  .memo-snippet {
+    font-size: 13px;
+    color: #778;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .memo-foot { display: flex; justify-content: space-between; align-items: center; }
+  .memo-thumb { max-height: 72px; border-radius: 8px; cursor: zoom-in; margin-bottom: 8px; display: block; }
+
+  /* ===== 备忘录弹窗附图 ===== */
+  .memo-img-row { display: flex; align-items: center; gap: 12px; }
+  .memo-img-preview { position: relative; display: inline-block; }
+  .memo-img-preview img { max-height: 84px; border-radius: 8px; display: block; }
+  .memo-img-preview button {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: #d66;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  /* ===== 回收站 ===== */
+  .trash-title { font-size: 16px; color: #2b4a6f; margin: 20px 0 12px; }
+  .trash-title:first-child { margin-top: 0; }
+  .trash-tip { text-align: center; color: #9ab; font-size: 12px; margin-top: 24px; }
+  .trash-actions { display: flex; gap: 8px; }
+  .trash-actions button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .trash-actions .restore { color: #4a9cf5; }
+  .trash-actions .restore:hover { background: #e3f0fd; }
+  .trash-actions .purge { color: #d66; }
+  .trash-actions .purge:hover { background: #fdeeee; }
+
+  /* ===== 弹窗 ===== */
+  .modal-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 40, 60, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(22px) saturate(1.8);
+    -webkit-backdrop-filter: blur(22px) saturate(1.8);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 20px 60px rgba(15, 80, 60, 0.25);
+    border-radius: 20px;
+    padding: 24px;
+    width: 92vw;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .modal h3 { color: #14604a; font-size: 17px; }
+  .modal input[type="text"], .modal textarea {
+    border: 1px solid #d4e2f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    width: 100%;
+  }
+  .modal input[type="text"]:focus, .modal textarea:focus { border-color: #34c98e; }
+  .modal textarea { min-height: 160px; resize: vertical; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+  .btn-plain {
+    border: 1px solid #d4e2f0;
+    background: #fff;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #556;
+  }
+  .btn-plain:hover { background: #f0f5fa; }
+  .modal-error {
+    color: #d66;
+    font-size: 13px;
+    min-height: 18px;
+    display: none;
+  }
+  .modal-error.show { display: block; }
+
+  @media (max-width: 600px) {
+    header { padding: 0 12px; gap: 12px; }
+    .nav-bar { padding: 6px 12px; }
+    main { padding: 16px 12px; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<!-- 启动屏 -->
+<div class="splash" id="splash">
+  <div class="splash-sky">
+    <div class="splash-moon"></div>
+    <div class="stars" id="stars"></div>
+  </div>
+  <div class="splash-inner">
+    <div class="splash-icon">
+      <span class="splash-tag">📘</span>
+    </div>
+    <h1 class="splash-title">自用备忘录</h1>
+    <p class="splash-sub">记录学习 · 珍藏笔记</p>
+    <div class="splash-loading">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+  <div class="splash-class">2650101班</div>
+  <div class="splash-credit">刘欣制作</div>
+</div>
+
+<header>
+  <h1>📘 学习错题相册</h1>
+  <div class="backup-actions">
+    <button id="btnExport" title="把图片和备忘录打包下载为备份文件">导出备份</button>
+    <button id="btnImport" title="从备份文件恢复数据（自动合并）">导入恢复</button>
+    <input type="file" id="importInput" accept=".json,application/json" hidden>
+  </div>
+</header>
+
+<!-- 分类栏：单独一行，避免手机端被挤没 -->
+<div class="nav-bar">
+  <nav>
+    <button data-page="home" class="active">首页</button>
+    <button data-page="subject" data-subject="高数">高数</button>
+    <button data-page="subject" data-subject="计算机">计算机</button>
+    <button data-page="subject" data-subject="英语">英语</button>
+    <button data-page="memo">备忘录</button>
+    <button data-page="trash">回收站</button>
+  </nav>
+</div>
+
+<main>
+  <!-- ===== 首页：图片相册 ===== -->
+  <section id="page-home">
+    <div class="toolbar">
+      <button class="btn-primary btn-starry" id="btnUpload">＋ 上传图片</button>
+      <input type="file" id="fileInput" accept="image/*" multiple hidden>
+      <input type="search" id="searchPhoto" placeholder="搜索备注文字…">
+      <select id="filterPhotoTag"><option value="">全部标签</option></select>
+    </div>
+    <div class="grid" id="photoGrid"></div>
+    <p class="empty" id="photoEmpty" data-icon="📷" hidden>暂无图片，点击「＋ 上传图片」添加题目或笔记照片吧</p>
+  </section>
+
+  <!-- ===== 备忘录页 ===== -->
+  <section id="page-memo" hidden>
+    <div class="toolbar">
+      <button class="btn-primary btn-starry" id="btnNewMemo">＋ 新建备忘录</button>
+      <input type="search" id="searchMemo" placeholder="搜索标题或正文…">
+      <select id="filterMemoTag"><option value="">全部标签</option></select>
+    </div>
+    <div id="memoList"></div>
+    <p class="empty" id="memoEmpty" data-icon="📝" hidden>暂无备忘录，点击「＋ 新建备忘录」记录通知和事项吧</p>
+  </section>
+
+  <!-- ===== 回收站页 ===== -->
+  <section id="page-trash" hidden>
+    <h2 class="trash-title">🖼 已删除的图片</h2>
+    <div class="grid" id="trashPhotoGrid"></div>
+    <h2 class="trash-title">📝 已删除的备忘录</h2>
+    <div id="trashMemoList"></div>
+    <p class="empty" id="trashEmpty" data-icon="🗑️" hidden>回收站是空的</p>
+    <p class="trash-tip">回收站内容保留 30 天，到期自动彻底清除</p>
+  </section>
+</main>
+
+<!-- 大图预览 -->
+<div class="overlay" id="lightbox" hidden>
+  <img id="lightboxImg" alt="预览">
+  <button class="close-btn" id="lightboxClose">✕</button>
+</div>
+
+<!-- 备忘录编辑弹窗 -->
+<div class="modal-mask" id="memoModal" hidden>
+  <div class="modal">
+    <h3 id="memoModalTitle">新建备忘录</h3>
+    <input type="text" id="memoTitle" placeholder="标题（如：图书馆闭馆通知）" maxlength="50">
+    <textarea id="memoBody" placeholder="正文内容，只存纯文本…"></textarea>
+    <div class="memo-img-row">
+      <div class="memo-img-preview" id="memoImgPreview" hidden>
+        <img id="memoImgThumb" alt="备忘录附图">
+        <button type="button" id="memoImgRemove" title="移除图片">✕</button>
+      </div>
+      <button type="button" class="btn-plain" id="memoImgAdd">🖼 添加图片</button>
+      <input type="file" id="memoImgInput" accept="image/*" hidden>
+    </div>
+    <div class="tags" id="memoTags"></div>
+    <input type="text" class="tag-add-input" id="memoTagInput" placeholder="＋回车加标签" style="width:110px">
+    <p class="modal-error" id="memoError"></p>
+    <div class="modal-actions">
+      <button class="btn-plain" id="memoCancel">取消</button>
+      <button class="btn-primary btn-starry" id="memoSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+ * 数据层：图片存 IndexedDB，备忘录存 localStorage
+ * ============================================================ */
+const photoDB = {
+  db: null,
+  open() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open('studyAlbumDB', 2);
+      req.onupgradeneeded = e => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('photos')) {
+          db.createObjectStore('photos', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('memoImages')) {
+          db.createObjectStore('memoImages', { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = e => { this.db = e.target.result; resolve(); };
+      req.onerror = e => reject(e.target.error);
+      req.onblocked = () => reject(new Error('数据库被其他页面占用，请关闭其他打开的页面后刷新'));
+    });
+  },
+  store(mode, name = 'photos') {
+    return this.db.transaction(name, mode).objectStore(name);
+  },
+  getAll() {
+    return new Promise((resolve, reject) => {
+      const req = this.store('readonly').getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = e => reject(e.target.error);
+    });
+  },
+  put(photo) {
+    return new Promise((resolve, reject) => {
+      const req = this.store('readwrite').put(photo);
+      req.onsuccess = () => resolve();
+      req.onerror = e => reject(e.target.error);
+    });
+  },
+  del(id) {
+    return new Promise((resolve, reject) => {
+      const req = this.store('readwrite').delete(id);
+      req.onsuccess = () => resolve();
+      req.onerror = e => reject(e.target.error);
+    });
+  },
+  // 备忘录附图（独立表，不占相册）
+  getImage(id) {
+    return new Promise((resolve, reject) => {
+      const req = this.store('readonly', 'memoImages').get(id);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = e => reject(e.target.error);
+    });
+  },
+  putImage(rec) {
+    return new Promise((resolve, reject) => {
+      const req = this.store('readwrite', 'memoImages').put(rec);
+      req.onsuccess = () => resolve();
+      req.onerror = e => reject(e.target.error);
+    });
+  },
+  delImage(id) {
+    return new Promise((resolve, reject) => {
+      const req = this.store('readwrite', 'memoImages').delete(id);
+      req.onsuccess = () => resolve();
+      req.onerror = e => reject(e.target.error);
+    });
+  }
+};
+
+const memoStore = {
+  KEY: 'studyAlbumMemos',
+  getAll() {
+    try { return JSON.parse(localStorage.getItem(this.KEY)) || []; }
+    catch { return []; }
+  },
+  saveAll(memos) {
+    localStorage.setItem(this.KEY, JSON.stringify(memos));
+  }
+};
+
+/* ============================================================
+ * 通用工具
+ * ============================================================ */
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+function fmtTime(ts) {
+  const d = new Date(ts);
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+/* 构建标签 chips（带删除叉号），onRemove(tag) 回调 */
+function buildTagChips(container, tags, onRemove) {
+  container.innerHTML = '';
+  tags.forEach(tag => {
+    const chip = el('span', 'tag');
+    chip.appendChild(document.createTextNode(tag));
+    const x = el('span', 'tag-x', '×');
+    x.title = '移除标签';
+    x.onclick = e => { e.stopPropagation(); onRemove(tag); };
+    chip.appendChild(x);
+    container.appendChild(chip);
+  });
+}
+/* 刷新筛选下拉框选项，keepValue 保持当前选中 */
+function rebuildTagSelect(selectEl, allTags) {
+  const current = selectEl.value;
+  selectEl.innerHTML = '<option value="">全部标签</option>';
+  [...new Set(allTags)].forEach(tag => {
+    const opt = el('option', '', tag);
+    opt.value = tag;
+    selectEl.appendChild(opt);
+  });
+  selectEl.value = [...selectEl.options].some(o => o.value === current) ? current : '';
+}
+
+/* ============================================================
+ * 页面切换
+ * ============================================================ */
+let currentSubject = ''; // '' 表示首页（全部图片）
+
+document.querySelectorAll('nav button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const page = btn.dataset.page;
+    currentSubject = page === 'subject' ? btn.dataset.subject : '';
+    document.getElementById('page-home').hidden = !(page === 'home' || page === 'subject');
+    document.getElementById('page-memo').hidden = page !== 'memo';
+    document.getElementById('page-trash').hidden = page !== 'trash';
+    if (page === 'home' || page === 'subject') renderPhotos();
+    if (page === 'trash') renderTrash();
+  };
+});
+
+/* ============================================================
+ * 模块一：图片相册
+ * ============================================================ */
+let photos = []; // 内存缓存，新→旧排序
+
+async function loadPhotos() {
+  photos = (await photoDB.getAll()).sort((a, b) => b.createdAt - a.createdAt);
+  renderPhotos();
+}
+
+function filteredPhotos() {
+  const kw = document.getElementById('searchPhoto').value.trim().toLowerCase();
+  const tag = document.getElementById('filterPhotoTag').value;
+  return photos.filter(p =>
+    !p.deletedAt &&
+    (!currentSubject || p.tags.includes(currentSubject)) &&
+    (!tag || p.tags.includes(tag)) &&
+    (!kw || (p.note || '').toLowerCase().includes(kw))
+  );
+}
+
+function renderPhotos() {
+  const grid = document.getElementById('photoGrid');
+  grid.innerHTML = '';
+  const list = filteredPhotos();
+  const emptyEl = document.getElementById('photoEmpty');
+  emptyEl.hidden = list.length > 0;
+  emptyEl.textContent = currentSubject
+    ? `「${currentSubject}」分类下暂无图片，点击「＋ 上传图片」添加吧`
+    : '暂无图片，点击「＋ 上传图片」添加题目或笔记照片吧';
+  rebuildTagSelect(document.getElementById('filterPhotoTag'), photos.filter(p => !p.deletedAt).flatMap(p => p.tags));
+
+  list.forEach(photo => {
+    const card = el('div', 'card');
+
+    // 图片（点击大图预览）
+    const img = el('img', 'thumb');
+    img.src = URL.createObjectURL(photo.blob);
+    img.alt = photo.note || '题目/笔记图片';
+    img.onclick = () => openLightbox(img.src);
+    card.appendChild(img);
+
+    const body = el('div', 'card-body');
+
+    // 备注框（自动保存，防抖 500ms）
+    const note = el('textarea', 'note-input');
+    note.placeholder = '写点备注…（如：微积分第三章错题）';
+    note.value = photo.note || '';
+    let timer = null;
+    note.oninput = () => {
+      clearTimeout(timer);
+      timer = setTimeout(async () => {
+        photo.note = note.value.trim();
+        await photoDB.put(photo);
+      }, 500);
+    };
+    body.appendChild(note);
+
+    // 标签区
+    const tagRow = el('div', 'tags');
+    buildTagChips(tagRow, photo.tags, async tag => {
+      photo.tags = photo.tags.filter(t => t !== tag);
+      await photoDB.put(photo);
+      renderPhotos();
+    });
+    // 科目快捷标签：点一下即归类，不用手打
+    ['高数', '计算机', '英语'].filter(s => !photo.tags.includes(s)).forEach(s => {
+      const quickBtn = el('button', 'tag-quick', '＋' + s);
+      quickBtn.type = 'button';
+      quickBtn.onclick = async () => {
+        photo.tags.push(s);
+        await photoDB.put(photo);
+        renderPhotos();
+        showToast(`已归入「${s}」分类`);
+      };
+      tagRow.appendChild(quickBtn);
+    });
+    const tagInput = el('input', 'tag-add-input');
+    tagInput.type = 'text';
+    tagInput.placeholder = '＋自定义';
+    tagInput.maxLength = 12;
+    tagInput.onkeydown = async e => {
+      if (e.key === 'Enter') {
+        const tag = tagInput.value.trim();
+        if (tag && !photo.tags.includes(tag)) {
+          photo.tags.push(tag);
+          await photoDB.put(photo);
+          renderPhotos();
+        }
+        tagInput.value = '';
+      }
+    };
+    tagRow.appendChild(tagInput);
+    body.appendChild(tagRow);
+
+    // 底部：时间 + 删除
+    const footer = el('div', 'card-footer');
+    footer.appendChild(el('span', 'time', fmtTime(photo.createdAt)));
+    const delBtn = el('button', 'btn-del', '删除');
+    delBtn.onclick = async () => {
+      photo.deletedAt = Date.now(); // 软删除：进回收站，30 天内可恢复
+      await photoDB.put(photo);
+      renderPhotos();
+      showToast('已移入回收站，30 天内可恢复');
+    };
+    footer.appendChild(delBtn);
+    body.appendChild(footer);
+
+    card.appendChild(body);
+    grid.appendChild(card);
+  });
+}
+
+// 上传图片
+document.getElementById('btnUpload').onclick = () => document.getElementById('fileInput').click();
+document.getElementById('fileInput').onchange = async e => {
+  if (!photoDB.db) {
+    e.target.value = '';
+    showToast('图片库未连接成功，请刷新页面后重试', true);
+    return;
+  }
+  try {
+    const files = [...e.target.files];
+    for (const file of files) {
+      await photoDB.put({
+        id: uid(),
+        blob: file,
+        note: '',
+        tags: currentSubject ? [currentSubject] : [],
+        createdAt: Date.now()
+      });
+    }
+    e.target.value = '';
+    await loadPhotos();
+  } catch (err) {
+    showToast('上传失败：' + err.message, true);
+  }
+};
+
+// 大图预览
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').hidden = false;
+}
+document.getElementById('lightbox').onclick = () => {
+  document.getElementById('lightbox').hidden = true;
+};
+
+// 首页搜索 / 筛选
+document.getElementById('searchPhoto').oninput = renderPhotos;
+document.getElementById('filterPhotoTag').onchange = renderPhotos;
+
+/* ============================================================
+ * 模块二：备忘录
+ * ============================================================ */
+let memos = [];
+let editingMemoId = null;   // null 表示新建
+let editingMemoTags = [];   // 弹窗里编辑中的标签
+let editingMemoImage = null; // 弹窗里编辑中的附图 {id, blob, isNew}
+let removedMemoImageId = null; // 编辑中被移除、待保存时清理的旧图 id
+
+function loadMemos() {
+  memos = memoStore.getAll().sort((a, b) => b.updatedAt - a.updatedAt);
+  renderMemos();
+}
+
+function filteredMemos() {
+  const kw = document.getElementById('searchMemo').value.trim().toLowerCase();
+  const tag = document.getElementById('filterMemoTag').value;
+  return memos.filter(m =>
+    !m.deletedAt &&
+    (!tag || m.tags.includes(tag)) &&
+    (!kw || m.title.toLowerCase().includes(kw) || m.body.toLowerCase().includes(kw))
+  );
+}
+
+function renderMemos() {
+  const listEl = document.getElementById('memoList');
+  listEl.innerHTML = '';
+  const list = filteredMemos();
+  document.getElementById('memoEmpty').hidden = list.length > 0;
+  rebuildTagSelect(document.getElementById('filterMemoTag'), memos.filter(m => !m.deletedAt).flatMap(m => m.tags));
+
+  list.forEach(memo => {
+    const item = el('div', 'memo-item');
+
+    const head = el('div', 'memo-head');
+    head.appendChild(el('span', 'memo-title', memo.title || '（无标题）'));
+    const actions = el('div', 'memo-actions');
+    const editBtn = el('button', 'edit', '编辑');
+    editBtn.onclick = e => { e.stopPropagation(); openMemoModal(memo); };
+    const delBtn = el('button', 'del', '删除');
+    delBtn.onclick = e => {
+      e.stopPropagation();
+      memo.deletedAt = Date.now(); // 软删除：进回收站，30 天内可恢复
+      memoStore.saveAll(memos);
+      renderMemos();
+      showToast('已移入回收站，30 天内可恢复');
+    };
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+    head.appendChild(actions);
+    item.appendChild(head);
+
+    item.appendChild(el('div', 'memo-snippet', memo.body.slice(0, 80) || '（无内容）'));
+
+    // 附图缩略图（有就显示，点击看大图）
+    if (memo.imageId) {
+      const thumb = el('img', 'memo-thumb');
+      thumb.alt = '备忘录附图';
+      photoDB.getImage(memo.imageId).then(rec => {
+        if (rec) thumb.src = URL.createObjectURL(rec.blob);
+      });
+      thumb.onclick = e => { e.stopPropagation(); if (thumb.src) openLightbox(thumb.src); };
+      item.appendChild(thumb);
+    }
+
+    const foot = el('div', 'memo-foot');
+    const tagRow = el('div', 'tags');
+    buildTagChips(tagRow, memo.tags, () => {}); // 列表页标签仅展示
+    foot.appendChild(tagRow);
+    foot.appendChild(el('span', 'time', '更新于 ' + fmtTime(memo.updatedAt)));
+    item.appendChild(foot);
+
+    item.onclick = () => openMemoModal(memo); // 点击整条也可编辑
+    listEl.appendChild(item);
+  });
+}
+
+// 打开备忘录弹窗（memo 为 null 表示新建）
+async function openMemoModal(memo) {
+  editingMemoId = memo ? memo.id : null;
+  editingMemoTags = memo ? [...memo.tags] : [];
+  editingMemoImage = null;
+  removedMemoImageId = null;
+  document.getElementById('memoModalTitle').textContent = memo ? '编辑备忘录' : '新建备忘录';
+  document.getElementById('memoTitle').value = memo ? memo.title : '';
+  document.getElementById('memoBody').value = memo ? memo.body : '';
+  renderModalTags();
+  document.getElementById('memoError').textContent = '';
+  document.getElementById('memoError').classList.remove('show');
+  updateMemoImgUI();
+  document.getElementById('memoModal').hidden = false;
+  document.getElementById('memoTitle').focus();
+  // 已有附图则异步加载预览
+  if (memo && memo.imageId) {
+    const rec = await photoDB.getImage(memo.imageId);
+    if (rec && editingMemoId === memo.id) {
+      editingMemoImage = { id: memo.imageId, blob: rec.blob, isNew: false };
+      updateMemoImgUI();
+    }
+  }
+}
+
+function updateMemoImgUI() {
+  const preview = document.getElementById('memoImgPreview');
+  const addBtn = document.getElementById('memoImgAdd');
+  if (editingMemoImage) {
+    document.getElementById('memoImgThumb').src = URL.createObjectURL(editingMemoImage.blob);
+    preview.hidden = false;
+    addBtn.textContent = '🔁 换一张';
+  } else {
+    preview.hidden = true;
+    addBtn.textContent = '🖼 添加图片';
+  }
+}
+
+document.getElementById('memoImgAdd').onclick = () => document.getElementById('memoImgInput').click();
+document.getElementById('memoImgInput').onchange = e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  // 换图时旧图若已入库，记为待清理
+  if (editingMemoImage && !editingMemoImage.isNew) removedMemoImageId = editingMemoImage.id;
+  editingMemoImage = { id: uid(), blob: file, isNew: true };
+  updateMemoImgUI();
+};
+document.getElementById('memoImgRemove').onclick = () => {
+  if (editingMemoImage && !editingMemoImage.isNew) removedMemoImageId = editingMemoImage.id;
+  editingMemoImage = null;
+  updateMemoImgUI();
+};
+
+function renderModalTags() {
+  buildTagChips(document.getElementById('memoTags'), editingMemoTags, tag => {
+    editingMemoTags = editingMemoTags.filter(t => t !== tag);
+    renderModalTags();
+  });
+}
+
+document.getElementById('memoTagInput').onkeydown = e => {
+  if (e.key === 'Enter') {
+    const tag = e.target.value.trim();
+    if (tag && !editingMemoTags.includes(tag)) {
+      editingMemoTags.push(tag);
+      renderModalTags();
+    }
+    e.target.value = '';
+  }
+};
+
+document.getElementById('btnNewMemo').onclick = () => openMemoModal(null);
+document.getElementById('memoCancel').onclick = () => {
+  document.getElementById('memoModal').hidden = true;
+};
+document.getElementById('memoModal').onclick = e => {
+  if (e.target.id === 'memoModal') e.target.hidden = true; // 点遮罩关闭
+};
+document.getElementById('memoSave').onclick = async () => {
+  const title = document.getElementById('memoTitle').value.trim();
+  const body = document.getElementById('memoBody').value.trim();
+  const err = document.getElementById('memoError');
+  if (!title && !body && !editingMemoImage) {
+    err.textContent = '标题、正文和图片不能都为空';
+    err.classList.add('show');
+    return;
+  }
+  err.textContent = '';
+  err.classList.remove('show');
+  // 保存附图：新图入库，被移除/被替换的旧图清理
+  let imageId = null;
+  if (editingMemoImage) {
+    imageId = editingMemoImage.id;
+    if (editingMemoImage.isNew) await photoDB.putImage({ id: imageId, blob: editingMemoImage.blob });
+  }
+  if (removedMemoImageId) await photoDB.delImage(removedMemoImageId);
+  const now = Date.now();
+  if (editingMemoId) {
+    const memo = memos.find(m => m.id === editingMemoId);
+    Object.assign(memo, { title, body, tags: [...editingMemoTags], imageId, updatedAt: now });
+  } else {
+    memos.push({ id: uid(), title, body, tags: [...editingMemoTags], imageId, createdAt: now, updatedAt: now });
+  }
+  memoStore.saveAll(memos);
+  document.getElementById('memoModal').hidden = true;
+  loadMemos();
+};
+
+// 备忘录页搜索 / 筛选
+document.getElementById('searchMemo').oninput = renderMemos;
+document.getElementById('filterMemoTag').onchange = renderMemos;
+
+/* ============================================================
+ * 模块三：回收站（软删除的内容 30 天内可恢复）
+ * ============================================================ */
+const TRASH_KEEP_DAYS = 30;
+
+function trashItemButtons(onRestore, onPurge) {
+  const box = el('div', 'trash-actions');
+  const restoreBtn = el('button', 'restore', '恢复');
+  restoreBtn.onclick = e => { e.stopPropagation(); onRestore(); };
+  const purgeBtn = el('button', 'purge', '彻底删除');
+  purgeBtn.onclick = e => {
+    e.stopPropagation();
+    if (confirm('彻底删除后无法恢复，确定吗？')) onPurge();
+  };
+  box.appendChild(restoreBtn);
+  box.appendChild(purgeBtn);
+  return box;
+}
+
+function renderTrash() {
+  const trashPhotos = photos.filter(p => p.deletedAt).sort((a, b) => b.deletedAt - a.deletedAt);
+  const trashMemos = memos.filter(m => m.deletedAt).sort((a, b) => b.deletedAt - a.deletedAt);
+  document.getElementById('trashEmpty').hidden = trashPhotos.length + trashMemos.length > 0;
+
+  // 已删除的图片
+  const photoGrid = document.getElementById('trashPhotoGrid');
+  photoGrid.innerHTML = '';
+  trashPhotos.forEach(photo => {
+    const card = el('div', 'card');
+    const img = el('img', 'thumb');
+    img.src = URL.createObjectURL(photo.blob);
+    img.alt = photo.note || '已删除图片';
+    img.onclick = () => openLightbox(img.src);
+    card.appendChild(img);
+    const body = el('div', 'card-body');
+    if (photo.note) body.appendChild(el('div', 'memo-snippet', photo.note));
+    const footer = el('div', 'card-footer');
+    footer.appendChild(el('span', 'time', '删于 ' + fmtTime(photo.deletedAt)));
+    footer.appendChild(trashItemButtons(
+      async () => {
+        delete photo.deletedAt;
+        await photoDB.put(photo);
+        renderTrash();
+        showToast('图片已恢复');
+      },
+      async () => {
+        await photoDB.del(photo.id);
+        photos = photos.filter(p => p.id !== photo.id);
+        renderTrash();
+        showToast('已彻底删除');
+      }
+    ));
+    body.appendChild(footer);
+    card.appendChild(body);
+    photoGrid.appendChild(card);
+  });
+
+  // 已删除的备忘录
+  const memoList = document.getElementById('trashMemoList');
+  memoList.innerHTML = '';
+  trashMemos.forEach(memo => {
+    const item = el('div', 'memo-item');
+    const head = el('div', 'memo-head');
+    head.appendChild(el('span', 'memo-title', memo.title || '（无标题）'));
+    head.appendChild(trashItemButtons(
+      () => {
+        delete memo.deletedAt;
+        memoStore.saveAll(memos);
+        renderTrash();
+        showToast('备忘录已恢复');
+      },
+      async () => {
+        if (memo.imageId) await photoDB.delImage(memo.imageId);
+        memos = memos.filter(m => m.id !== memo.id);
+        memoStore.saveAll(memos);
+        renderTrash();
+        showToast('已彻底删除');
+      }
+    ));
+    item.appendChild(head);
+    item.appendChild(el('div', 'memo-snippet', memo.body.slice(0, 80) || '（无内容）'));
+
+    // 附图缩略图（有就显示，点击看大图）
+    if (memo.imageId) {
+      const thumb = el('img', 'memo-thumb');
+      thumb.alt = '备忘录附图';
+      photoDB.getImage(memo.imageId).then(rec => {
+        if (rec) thumb.src = URL.createObjectURL(rec.blob);
+      });
+      thumb.onclick = e => { e.stopPropagation(); if (thumb.src) openLightbox(thumb.src); };
+      item.appendChild(thumb);
+    }
+    const foot = el('div', 'memo-foot');
+    foot.appendChild(el('span', 'time', '删于 ' + fmtTime(memo.deletedAt)));
+    item.appendChild(foot);
+    memoList.appendChild(item);
+  });
+}
+
+// 启动时清理超过 30 天的回收站内容
+async function purgeExpiredTrash() {
+  const deadline = Date.now() - TRASH_KEEP_DAYS * 24 * 3600 * 1000;
+  for (const p of photos.filter(p => p.deletedAt && p.deletedAt < deadline)) {
+    await photoDB.del(p.id);
+    photos = photos.filter(x => x.id !== p.id);
+  }
+  const before = memos.length;
+  const expired = memos.filter(m => m.deletedAt && m.deletedAt < deadline);
+  for (const m of expired) {
+    if (m.imageId) await photoDB.delImage(m.imageId);
+  }
+  memos = memos.filter(m => !(m.deletedAt && m.deletedAt < deadline));
+  if (memos.length !== before) memoStore.saveAll(memos);
+}
+
+/* ============================================================
+ * 模块四：导出备份 / 导入恢复
+ * ============================================================ */
+function showToast(msg, isError) {
+  let t = document.querySelector('.toast');
+  if (!t) {
+    t = el('div', 'toast');
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function blobToDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function dataURLtoBlob(dataURL) {
+  const res = await fetch(dataURL);
+  return res.blob();
+}
+
+// 导出：图片 + 备忘录 → 单个 JSON 备份文件
+document.getElementById('btnExport').onclick = async () => {
+  try {
+    const allPhotos = await photoDB.getAll();
+    const photosData = [];
+    for (const p of allPhotos) {
+      photosData.push({
+        id: p.id,
+        note: p.note || '',
+        tags: p.tags || [],
+        createdAt: p.createdAt,
+        mime: p.blob.type || 'image/png',
+        dataURL: await blobToDataURL(p.blob)
+      });
+    }
+    // 备忘录附图一并打包
+    const allMemos = memoStore.getAll();
+    const memoImagesData = [];
+    for (const m of allMemos) {
+      if (m.imageId) {
+        const rec = await photoDB.getImage(m.imageId);
+        if (rec) memoImagesData.push({ id: m.imageId, dataURL: await blobToDataURL(rec.blob) });
+      }
+    }
+    const backup = {
+      app: 'studyAlbum',
+      version: 2,
+      exportedAt: Date.now(),
+      photos: photosData,
+      memos: allMemos,
+      memoImages: memoImagesData
+    };
+    const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
+    const a = document.createElement('a');
+    const d = new Date();
+    const p2 = n => String(n).padStart(2, '0');
+    a.href = URL.createObjectURL(blob);
+    a.download = `错题相册备份_${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}_${p2(d.getHours())}${p2(d.getMinutes())}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast(`已导出 ${photosData.length} 张图片、${backup.memos.length} 条备忘录`);
+  } catch (e) {
+    showToast('导出失败：' + e.message, true);
+  }
+};
+
+// 导入：按 id 合并，重复数据以备份里的为准
+document.getElementById('btnImport').onclick = () => document.getElementById('importInput').click();
+document.getElementById('importInput').onchange = async e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const backup = JSON.parse(await file.text());
+    if (backup.app !== 'studyAlbum' || !Array.isArray(backup.photos) || !Array.isArray(backup.memos)) {
+      showToast('这不是本应用的备份文件', true);
+      return;
+    }
+    for (const p of backup.photos) {
+      const blob = await dataURLtoBlob(p.dataURL);
+      await photoDB.put({ id: p.id, blob, note: p.note, tags: p.tags, createdAt: p.createdAt });
+    }
+    // 恢复备忘录附图（旧版备份没有此字段，跳过即可）
+    for (const img of backup.memoImages || []) {
+      const blob = await dataURLtoBlob(img.dataURL);
+      await photoDB.putImage({ id: img.id, blob });
+    }
+    const map = new Map(memoStore.getAll().map(m => [m.id, m]));
+    for (const m of backup.memos) map.set(m.id, m); // 同 id 覆盖
+    memoStore.saveAll([...map.values()]);
+    await loadPhotos();
+    loadMemos();
+    showToast(`恢复完成：${backup.photos.length} 张图片、${backup.memos.length} 条备忘录已合并`);
+  } catch (err) {
+    showToast('导入失败：文件无法读取或格式不正确', true);
+  }
+};
+
+/* ============================================================
+ * 启动屏：星星 + 流星 + 3 秒自动隐藏
+ * ============================================================ */
+function initSplash() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  const sky = splash.querySelector('.splash-sky');
+  const starsContainer = document.getElementById('stars');
+
+  // 生成铺满全屏的星星
+  if (starsContainer) {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const count = Math.floor((w * h) / 8000);
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      const size = Math.random() * 1.5 + 1;
+      s.style.width = size + 'px';
+      s.style.height = size + 'px';
+      s.style.setProperty('--dur', (Math.random() * 2 + 2) + 's');
+      s.style.setProperty('--delay', Math.random() * 3 + 's');
+      if (Math.random() > 0.7) s.style.background = '#cfe0ff';
+      starsContainer.appendChild(s);
+    }
+  }
+
+  // 动态生成流星
+  const spawnMeteor = () => {
+    if (!splash.parentNode) return;
+    const m = document.createElement('div');
+    m.className = 'meteor';
+    m.style.top = (Math.random() * 80) + '%';
+    m.style.left = (Math.random() * 100 - 20) + '%';
+    const duration = Math.random() * 1 + 1.2;
+    m.style.animation = `meteor ${duration}s linear forwards`;
+    sky.appendChild(m);
+    setTimeout(() => m.remove(), duration * 1000 + 100);
+  };
+  spawnMeteor();
+  const meteorTimer = setInterval(spawnMeteor, 250);
+
+  // 展示 3 秒后淡出并移除
+  setTimeout(() => {
+    clearInterval(meteorTimer);
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 600);
+  }, 3000);
+}
+
+/* ============================================================
+ * 启动
+ * ============================================================ */
+(async function init() {
+  initSplash();
+  try {
+    await photoDB.open();
+  } catch (err) {
+    showToast('图片库打开失败：' + err.message, true);
+  }
+  if (photoDB.db) {
+    await loadPhotos();
+    await purgeExpiredTrash(); // 清理回收站超期内容
+  }
+  loadMemos();
+})();
+</script>
+</body>
+</html>
